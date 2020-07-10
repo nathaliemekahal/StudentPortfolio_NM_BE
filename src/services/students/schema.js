@@ -1,7 +1,21 @@
 const { Schema, model } = require("mongoose");
 const mongoose = require("mongoose");
 const valid = require("validator");
-
+// const studentModel = require("./schema");
+const projectSchema = new Schema({
+  name: {
+    type: String,
+  },
+  description: {
+    type: String,
+  },
+  startDate: {
+    type: Date,
+  },
+  endDate: {
+    type: Date,
+  },
+});
 const studentSchema = new Schema({
   name: {
     type: String,
@@ -44,6 +58,8 @@ const studentSchema = new Schema({
     },
   },
   country: String,
+  projects: [projectSchema],
+  ImageUrl:String
 });
 
 studentSchema.post("validate", function (error, doc, next) {
@@ -54,8 +70,33 @@ studentSchema.post("validate", function (error, doc, next) {
     next();
   }
 });
-
+studentSchema.static("addProject", async function (id, project) {
+  await studentModel.findOneAndUpdate(
+    { _id: id },
+    {
+      $addToSet: { projects: project },
+    }
+  );
+});
+studentSchema.static("removeProjectFromStudent", async function (id, projectID) {
+  await studentModel.findByIdAndUpdate(id, {
+    $pull: { projects: { _id: projectID } },
+  })
+})
+//ADDING IMGURL 
+studentSchema.static("addImgUrl", async function (id, imgUrl) {
+  await studentModel.update(
+    { _id: id },
+    
+    {
+      ImageUrl:imgUrl
+    },
+    {multi:true}, 
+ 
+)})
 //const studentModel = mongoose.model("student", studentSchema);
 
 //module.exports = studentModel;
-module.exports = model("student", studentSchema);
+const studentModel = mongoose.model("student", studentSchema);
+
+module.exports = studentModel;

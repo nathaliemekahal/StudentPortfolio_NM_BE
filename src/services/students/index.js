@@ -6,7 +6,7 @@ const multer = require("multer")
 const { join } = require("path")
 const {readFile, writeFile, createReadStream } = require("fs-extra")
 const upload = multer({})
-const studentSchema = require("./schema")
+const studentModel = require("./schema");
 const mongoose = require("mongoose");
 const q2m = require("query-to-mongo");
 
@@ -33,7 +33,7 @@ router.get("/", async (req, res) => {
   try {
     const query = q2m(req.query);
     console.log(query);
-    const students = await studentSchema
+    const students = await studentModel
       .find()
       .limit(query.options.limit)
       .skip(query.options.skip)
@@ -47,7 +47,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res, next) => {
   try {
     const id = req.params.id
-    const student = await studentSchema.findById(id)
+    const student = await studentModel.findById(id)
     if (student) {
       res.send(student)
     } else {
@@ -73,7 +73,7 @@ router.get("/:id", async (req, res, next) => {
 // })
 router.post("/", async (req, res, next) => {
   try {
-    const newStudent = new studentSchema(req.body)
+    const newStudent = new studentModel(req.body)
     const { _id } = await newStudent.save()
 
     res.status(201).send('created')
@@ -137,13 +137,13 @@ router.post("/", async (req, res, next) => {
 //   fs.writeFileSync(studentsFilePath, JSON.stringify(filteredstudentsArray))
 //   response.send("Ok")
 // })
-const studentsFolderPath = join(__dirname, "../../../public/img/students")
+const studentsFolderPath = join(__dirname, "../../../../StudentPortfolio_NM_FE/public/img/students")
 
 
 router.post("/:id/uploadPhoto", upload.single("avatar"), async (req, res, next) => {
   // req.file <-- here is where we're gonna find the file
   console.log(req.file.buffer)
-  console.log('joj')
+
   
   try {
     
@@ -153,13 +153,14 @@ router.post("/:id/uploadPhoto", upload.single("avatar"), async (req, res, next) 
     )
    
     const studentsArray= JSON.parse(fs.readFileSync(studentsFilePath).toString())
-    studentsArray.forEach(student =>{
-      if(student.id === req.params.id){
-        student['imageUrl'] =` http://localhost:3000/img/students/${req.params.id}.${req.file.mimetype.slice(-3)}`
-      }
-      fs.writeFileSync(studentsFilePath, JSON.stringify(studentsArray))
+    // studentsArray.forEach(student =>{
+      // if(student.id === req.params.id){
+        imageUrl =`http://localhost:3000/img/students/${req.params.id}.${req.file.originalname.split(".").pop()}`
+      // }
+      await studentModel.addImgUrl(req.params.id,imageUrl)
+      // fs.writeFileSync(studentsFilePath, JSON.stringify(studentsArray))
       res.send('uploaded successfully')
-    })
+    // })
 
   } catch (error) {
     console.log(error)
@@ -169,7 +170,7 @@ router.post("/:id/uploadPhoto", upload.single("avatar"), async (req, res, next) 
 
 router.put("/:id", async (req, res, next) => {
   try {
-    const student = await studentSchema.findByIdAndUpdate(req.params.id, req.body)
+    const student = await studentModel.findByIdAndUpdate(req.params.id, req.body)
 
     if (student) {
       res.send("Ok")
@@ -185,7 +186,7 @@ router.put("/:id", async (req, res, next) => {
 
 router.delete("/:id", async (req, res, next) => {
   try {
-    const student = await studentSchema.findByIdAndDelete(req.params.id)
+    const student = await studentModel.findByIdAndDelete(req.params.id)
     if (student) {
       res.send("Deleted")
     } else {
@@ -200,7 +201,7 @@ router.delete("/:id", async (req, res, next) => {
 
 router.post("/checkEmail", async (req, res) => {
   
-  const checkemail = await studentSchema.find({ email: req.body.email });
+  const checkemail = await studentModel.find({ email: req.body.email });
 
   if (checkemail.length !== 0) {
     res.send("ERROR!!! EMAIL EXISTS!!");
@@ -213,6 +214,7 @@ router.get("/:id/getPhoto", (req, res, next) => {
       if (fs.existsSync(path.join(studentsFolderPath, `${req.params.id}.png`))) {
           const source = fs.createReadStream(path.join(studentsFolderPath, `${req.params.id}.png`))
           source.pipe(res)
+      
       } else {
           const err = new Error()
           err.httpStatusCode = 404
@@ -225,5 +227,51 @@ router.get("/:id/getPhoto", (req, res, next) => {
   }
 })
 
+router.post("/projects/:id", async (req, res) => {
+  const project = { ...req.body };
+  await studentModel.addProject(req.params.id, project);
+  res.send("added");
+});
+//DELETE PROJECTS FROM STUDENTS
+router.delete("/projects/:id/:projectID", async (req, res, next) => {
+  try {
+    await studentModel.removeProjectFromStudent(req.params.id, req.params.projectID)
+    res.send("PROJECT REMOVED")
+  } catch (error) {
+    next(error)
+  }
+})
+router.post("/addStudentImage/:id/",async(req,res)=>{
+  await studentModel.findByIdAndUpdate(req.params.id,'jijhijhih')
+  res.send('done')
+})
+
+// router.post(
+//   "/:id/uploadImage",
+//   upload.single("productImage"),
+//   async (req, res, next) => {
+//     try {
+//       await writeFile(
+//         join(
+//           studentsFolderPath,
+//           req.params.id + "." + req.file.originalname.split(".").pop()
+//         ),
+//         req.file.buffer
+//       );
+//       const productsArray = JSON.parse(
+//         fs.readFileSync(productsFilePath).toString()
+//       );
+//       productsArray.forEach((product) => {
+//         if (product._id === req.params.id) {
+//           product["imageUrl"] = ` http://localhost:3000/img/Products/${
+//             req.params.id
+//           }.${req.file.originalname.split(".").pop()}`;
+//         }
+//         fs.writeFileSync(productsFilePath, JSON.stringify(productsArray));
+//         res.send("uploaded successfully");
+//       });
+//     } catch (error) {}
+//   }
+// );
 
 module.exports = router
