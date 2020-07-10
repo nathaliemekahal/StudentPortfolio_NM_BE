@@ -245,6 +245,10 @@ router.post("/addStudentImage/:id/",async(req,res)=>{
   await studentModel.findByIdAndUpdate(req.params.id,'jijhijhih')
   res.send('done')
 })
+router.get('/getimgurl/:id',async(req,res)=>{
+  let result=await studentModel.returnImgURL(req.params.id)
+  res.send(result[0]["ImageUrl"])
+})
 
 // router.post(
 //   "/:id/uploadImage",

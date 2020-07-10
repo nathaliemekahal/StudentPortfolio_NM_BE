@@ -94,6 +94,17 @@ studentSchema.static("addImgUrl", async function (id, imgUrl) {
     {multi:true}, 
  
 )})
+studentSchema.static('returnImgURL',async function(id){
+  let imgurl=await studentModel.find(
+    {_id:id},
+    {
+      ImageUrl:1,
+      _id:0
+    }
+    
+  )
+  return imgurl
+})
 //const studentModel = mongoose.model("student", studentSchema);
 
 //module.exports = studentModel;
