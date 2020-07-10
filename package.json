@@ -1,0 +1,26 @@
+{
+  "name": "m5d2_homework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon ./src/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-validator": "^6.6.0",
+    "fs-extra": "^9.0.1",
+    "mongoose": "^5.9.22",
+    "multer": "^1.4.2",
+    "query-to-mongo": "^0.10.1",
+    "uniqid": "^5.2.0",
+    "validation": "0.0.1"
+  }
+}
