@@ -229,6 +229,12 @@ router.post("/projects/:id", async (req, res) => {
   await studentModel.addProject(req.params.id, project);
   res.send("added");
 });
+
+router.get("/projects/:id", async (req, res) => {
+  let projects=await studentModel.getProjects(req.params.id);
+  console.log(projects)
+  res.send(projects);
+});
 //DELETE PROJECTS FROM STUDENTS
 router.delete("/projects/:id/:projectID", async (req, res, next) => {
   try {

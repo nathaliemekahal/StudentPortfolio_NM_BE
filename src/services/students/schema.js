@@ -78,6 +78,16 @@ studentSchema.static("addProject", async function (id, project) {
     }
   );
 });
+studentSchema.static("getProjects", async function (id) {
+  let projects= await studentModel.find(
+    {_id: id },
+    {
+      projects:1,
+      _id:0 
+    }
+  )
+  return projects
+});
 studentSchema.static("removeProjectFromStudent", async function (id, projectID) {
   await studentModel.findByIdAndUpdate(id, {
     $pull: { projects: { _id: projectID } },
