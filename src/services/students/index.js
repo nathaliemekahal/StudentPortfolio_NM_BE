@@ -141,10 +141,6 @@ const studentsFolderPath = join(__dirname, "../../../../StudentPortfolio_NM_FE/p
 
 
 router.post("/:id/uploadPhoto", upload.single("avatar"), async (req, res, next) => {
-  // req.file <-- here is where we're gonna find the file
-  console.log(req.file.buffer)
-
-  
   try {
     
     await writeFile(
@@ -152,7 +148,7 @@ router.post("/:id/uploadPhoto", upload.single("avatar"), async (req, res, next) 
       req.file.buffer
     )
    
-    const studentsArray= JSON.parse(fs.readFileSync(studentsFilePath).toString())
+    // const studentsArray= JSON.parse(fs.readFileSync(studentsFilePath).toString())
     // studentsArray.forEach(student =>{
       // if(student.id === req.params.id){
         imageUrl =`http://localhost:3000/img/students/${req.params.id}.${req.file.originalname.split(".").pop()}`
@@ -160,6 +156,7 @@ router.post("/:id/uploadPhoto", upload.single("avatar"), async (req, res, next) 
       await studentModel.addImgUrl(req.params.id,imageUrl)
       // fs.writeFileSync(studentsFilePath, JSON.stringify(studentsArray))
       res.send('uploaded successfully')
+    
     // })
 
   } catch (error) {
@@ -245,11 +242,26 @@ router.post("/addStudentImage/:id/",async(req,res)=>{
   await studentModel.findByIdAndUpdate(req.params.id,'jijhijhih')
   res.send('done')
 })
+//GET IMG URL
 router.get('/getimgurl/:id',async(req,res)=>{
   let result=await studentModel.returnImgURL(req.params.id)
   res.send(result[0]["ImageUrl"])
 })
 
+//PUT
+router.put("/projects/:id/:projectId",async(req,res)=>{
+  try {
+    // let student=await studentModel.findById(req.params.id)
+    // console.log(req.params.id,req.params.projectId)
+    
+    // let filteredProj= student.projects.filter(project=>project._id!==project.req.params.projectID)
+    await studentModel.updateProject(req.params.id,req.params.projectId,req.body)
+  
+    res.send('UPDATED')
+  } catch (error) {
+    
+  }
+})
 // router.post(
 //   "/:id/uploadImage",
 //   upload.single("productImage"),

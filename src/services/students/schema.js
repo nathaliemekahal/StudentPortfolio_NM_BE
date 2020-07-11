@@ -105,6 +105,24 @@ studentSchema.static('returnImgURL',async function(id){
   )
   return imgurl
 })
+
+// studentSchema.static("updateProject", async function (
+//   id,
+//   projectID,
+//   body
+// ) {
+//  let something = await studentModel.findOneAndUpdate({
+//     _id: id,
+//     "projects._id": projectID,
+//     body:body,
+    
+  
+//   },
+//   { $set: { "projects.$": body } }
+//   )
+// }
+
+// )
 //const studentModel = mongoose.model("student", studentSchema);
 
 //module.exports = studentModel;
